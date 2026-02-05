@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-oo12qwv0rlx%6_-t&z2@)ubi$t))4rlh-%_s3#^rq!rdiw!@^f
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.68.57',"http://iot.insurecow.com"]
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.68.57',"iot.insurecow.com"]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
