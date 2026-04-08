@@ -111,16 +111,24 @@ def cow_data(request):
 def cow_list(request):
     """
     GET endpoint to retrieve cow data.
-    Returns all cows if no cow_id specified.
+    Returns paginated cows if no cow_id specified.
     Returns specific cow if cow_id provided as query param.
     """
+    from rest_framework.pagination import PageNumberPagination
+
     cow_id = request.query_params.get('cow_id')
-    
+
     if cow_id:
         cow = get_object_or_404(Cow, cow_id=cow_id)
         serializer = CowSerializer(cow)
         return Response(serializer.data)
-    
+
     cows = Cow.objects.all().order_by('-timestamp')
-    serializer = CowSerializer(cows, many=True)
-    return Response(serializer.data)
+
+    # Apply pagination
+    paginator = PageNumberPagination()
+    paginator.page_size = request.query_params.get('page_size', 10)  # Allow custom page size
+    result_page = paginator.paginate_queryset(cows, request)
+
+    serializer = CowSerializer(result_page, many=True)
+    return paginator.get_paginated_response(serializer.data)
