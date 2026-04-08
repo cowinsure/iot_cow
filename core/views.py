@@ -86,9 +86,16 @@ def cow_data(request):
         temperature=data.get('temperature'),
         heart_rate=data.get('heart_rate'),
         activity_level=data.get('activity_level'),
+        activity_status=data.get('activity_status'),
         battery_level=data.get('battery_level'),
         latitude=data.get('latitude'),
         longitude=data.get('longitude'),
+        gyro_x=data.get('gyro_x'),
+        gyro_y=data.get('gyro_y'),
+        gyro_z=data.get('gyro_z'),
+        accel_x=data.get('accel_x'),
+        accel_y=data.get('accel_y'),
+        accel_z=data.get('accel_z'),
         raw_data=data,
     )
     
