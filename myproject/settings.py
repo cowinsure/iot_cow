@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-oo12qwv0rlx%6_-t&z2@)ubi$t))4rlh-%_s3#^rq!rdiw!@^f
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.68.57',"iot.insurecow.com"]
 
@@ -143,7 +143,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Extra directories where Django will look for static files during development
+STATICFILES_DIRS = []
 
 # Media files (uploads)
 MEDIA_URL = '/media/'
