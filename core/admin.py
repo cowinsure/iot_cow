@@ -1,5 +1,3 @@
-
-
 # Register your models here.
 from django.contrib import admin
 from .models import Profile, Cow
@@ -18,7 +16,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
 
 class CowAdmin(admin.ModelAdmin):
-	list_display = ('cow_id', 'temperature', 'heart_rate', 'activity_level', 'battery_level', 'latitude', 'longitude', 'timestamp')
+	list_display = ('cow_id', 'temperature', 'heart_rate', 'activity_level', 'activity_status', 'battery_level', 'latitude', 'longitude', 'gyro_x', 'gyro_y', 'gyro_z', 'accel_x', 'accel_y', 'accel_z', 'timestamp')
 	list_filter = ('cow_id', 'timestamp')
 	search_fields = ('cow_id',)
 	readonly_fields = ('timestamp', 'raw_data')
