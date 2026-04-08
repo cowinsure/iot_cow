@@ -6,6 +6,9 @@ from .serializers import ProfileSerializer, CowSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
 import logging
 
 logger = logging.getLogger(__name__)
@@ -48,6 +51,128 @@ def profile_detail(request, pk):
     if request.method == 'DELETE':
         profile.delete()
         return Response({"message": "Profile deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+
+# User registration
+@api_view(['POST'])
+def register_user(request):
+    """
+    Register a new user.
+    Expects: username, password, email (optional), first_name, last_name
+    """
+    data = request.data
+
+    username = data.get('username')
+    password = data.get('password')
+    email = data.get('email', '')
+    first_name = data.get('first_name', '')
+    last_name = data.get('last_name', '')
+
+    if not username or not password:
+        return Response(
+            {"error": "Username and password are required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if User.objects.filter(username=username).exists():
+        return Response(
+            {"error": "Username already exists"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if email and User.objects.filter(email=email).exists():
+        return Response(
+            {"error": "Email already exists"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        user = User.objects.create_user(
+            username=username,
+            password=password,
+            email=email,
+            first_name=first_name,
+            last_name=last_name
+        )
+
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
+
+        return Response({
+            "message": "User registered successfully",
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+            },
+            "tokens": {
+                "access": access_token,
+                "refresh": refresh_token
+            }
+        }, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+# User login
+@api_view(['POST'])
+def login_user(request):
+    """
+    Login user and return JWT tokens.
+    Expects: username, password
+    """
+    data = request.data
+
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return Response(
+            {"error": "Username and password are required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    user = authenticate(username=username, password=password)
+
+    if user is None:
+        return Response(
+            {"error": "Invalid credentials"},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+
+    if not user.is_active:
+        return Response(
+            {"error": "User account is disabled"},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+
+    # Generate JWT tokens
+    refresh = RefreshToken.for_user(user)
+    access_token = str(refresh.access_token)
+    refresh_token = str(refresh)
+
+    return Response({
+        "message": "Login successful",
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        },
+        "tokens": {
+            "access": access_token,
+            "refresh": refresh_token
+        }
+    }, status=status.HTTP_200_OK)
 
 
 # Endpoint to receive cow collar data from ESP32

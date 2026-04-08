@@ -1,0 +1,390 @@
+{
+  "info": {
+    "name": "Insurance Portal API",
+    "description": "Livestock & Insurance Management System API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "jwt_token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"johndoe\",\n  \"password\": \"securepassword123\",\n  \"email\": \"john.doe@example.com\",\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/register/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "register", "/"]
+            },
+            "description": "Register a new user account. Returns user data and JWT tokens upon successful registration."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('jwt_token', response.tokens.access);",
+                  "    pm.collectionVariables.set('refresh_token', response.tokens.refresh);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"johndoe\",\n  \"password\": \"securepassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/login/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "login", "/"]
+            },
+            "description": "Login with username and password. Returns user data and JWT tokens."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('jwt_token', response.tokens.access);",
+                  "    pm.collectionVariables.set('refresh_token', response.tokens.refresh);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get JWT Token (Alternative)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"johndoe\",\n  \"password\": \"securepassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/token/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "token", "/"]
+            },
+            "description": "Obtain JWT access and refresh tokens using Django REST Framework's built-in endpoint."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('jwt_token', response.access);",
+                  "    pm.collectionVariables.set('refresh_token', response.refresh);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh JWT Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/token/refresh/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "token", "refresh", "/"]
+            },
+            "description": "Refresh JWT access token using refresh token."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile Management",
+      "item": [
+        {
+          "name": "Get All Profiles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/profiles/",
+              "host": ["{{base_url}}"],
+              "path": ["profiles", "/"]
+            },
+            "description": "Retrieve all user profiles. Requires authentication."
+          }
+        },
+        {
+          "name": "Create Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"age\": 30,\n  \"image\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/profiles/",
+              "host": ["{{base_url}}"],
+              "path": ["profiles", "/"]
+            },
+            "description": "Create a new user profile. Requires authentication."
+          }
+        },
+        {
+          "name": "Get Profile by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/profiles/1/",
+              "host": ["{{base_url}}"],
+              "path": ["profiles", "1", "/"]
+            },
+            "description": "Retrieve a specific profile by ID. Replace '1' with actual profile ID."
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe Updated\",\n  \"email\": \"john.doe@example.com\",\n  \"age\": 31,\n  \"image\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/profiles/1/",
+              "host": ["{{base_url}}"],
+              "path": ["profiles", "1", "/"]
+            },
+            "description": "Update an entire profile. Replace '1' with actual profile ID."
+          }
+        },
+        {
+          "name": "Partial Update Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"age\": 32\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/profiles/1/",
+              "host": ["{{base_url}}"],
+              "path": ["profiles", "1", "/"]
+            },
+            "description": "Partially update a profile. Only specified fields will be updated."
+          }
+        },
+        {
+          "name": "Delete Profile",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/profiles/1/",
+              "host": ["{{base_url}}"],
+              "path": ["profiles", "1", "/"]
+            },
+            "description": "Delete a profile. Replace '1' with actual profile ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cow Data Management",
+      "item": [
+        {
+          "name": "Submit Cow Collar Data",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cow_id\": \"cow-red-hulk\",\n  \"temperature\": 27.36999,\n  \"heart_rate\": 0,\n  \"activity_level\": 14800.4,\n  \"battery_level\": 0,\n  \"latitude\": 0,\n  \"longitude\": 0,\n  \"activity_status\": \"Stationary\",\n  \"gyro_x\": -0.931298,\n  \"gyro_y\": -0.603053,\n  \"gyro_z\": -0.671756,\n  \"accel_x\": 0.036377,\n  \"accel_y\": 0.012207,\n  \"accel_z\": -0.848145,\n  \"raw\": {\n    \"activity_status\": \"Stationary\",\n    \"gyro_x\": -0.931298,\n    \"gyro_y\": -0.603053,\n    \"gyro_z\": -0.671756,\n    \"accel_x\": 0.036377,\n    \"accel_y\": 0.012207,\n    \"accel_z\": -0.848145\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/cow-data/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cow-data", "/"]
+            },
+            "description": "Submit sensor data from ESP32 cow collar. This endpoint accepts cow collar sensor readings."
+          }
+        },
+        {
+          "name": "Get All Cow Data (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/cows/?page=1&page_size=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cows", "/"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Retrieve all cow data with pagination. Use 'page' and 'page_size' query parameters."
+          }
+        },
+        {
+          "name": "Get Cow Data by Cow ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/cows/?cow_id=cow-red-hulk",
+              "host": ["{{base_url}}"],
+              "path": ["api", "cows", "/"],
+              "query": [
+                {
+                  "key": "cow_id",
+                  "value": "cow-red-hulk"
+                }
+              ]
+            },
+            "description": "Retrieve data for a specific cow by cow_id."
+          }
+        }
+      ]
+    },
+    {
+      "name": "API Documentation",
+      "item": [
+        {
+          "name": "Swagger UI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/schema/swagger-ui/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schema", "swagger-ui", "/"]
+            },
+            "description": "Interactive API documentation powered by Swagger UI."
+          }
+        },
+        {
+          "name": "ReDoc",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/schema/redoc/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schema", "redoc", "/"]
+            },
+            "description": "API documentation powered by ReDoc."
+          }
+        },
+        {
+          "name": "OpenAPI Schema",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/schema/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schema", "/"]
+            },
+            "description": "OpenAPI schema in JSON format."
+          }
+        }
+      ]
+    }
+  ]
+}
